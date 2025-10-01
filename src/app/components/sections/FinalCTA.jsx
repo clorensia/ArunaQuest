@@ -8,7 +8,7 @@ export default function FinalCTA() {
       <div className="container mx-auto px-6 text-center">
         <RevealOnScroll>
           <h2 className="text-3xl md:text-5xl font-extrabold text-white">
-            Ready to Find Your Career Clarity?
+            Suap Memulai Perjalanan Kariermu dengan Percaya Diri?
           </h2>
         </RevealOnScroll>
         
@@ -18,7 +18,7 @@ export default function FinalCTA() {
               href="#"
               className="cta-gradient text-white font-bold text-lg px-8 py-4 rounded-xl shadow-lg cta-button inline-block"
             >
-              Sign Up & Start Your Adventure
+              Coba Simulasi Gratis
             </a>
           </div>
         </RevealOnScroll>

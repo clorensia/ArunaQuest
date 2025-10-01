@@ -6,9 +6,6 @@ export default function SocialProof() {
   const companies = [
     'Skillvul',
     'Perempuan Inovasi',
-    'Gojek',
-    'Tokopedia',
-    'Binus University',
     'Yayasan Dian Sastro',
     'Markoding'
   ]
@@ -18,7 +15,7 @@ export default function SocialProof() {
       <div className="container mx-auto px-6 text-center">
         <RevealOnScroll>
           <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500">
-            TRUSTED BY STUDENTS & ALUMNI FROM
+            DIPERCAYA OLEH TALENTA DARI
           </h3>
         </RevealOnScroll>
         

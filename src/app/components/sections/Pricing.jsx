@@ -4,64 +4,62 @@ import { CheckCircle } from 'lucide-react'
 import RevealOnScroll from '@/components/animations/RevealOnScroll'
 
 export default function Pricing() {
-  const plans = [
-    {
-      name: 'Explorer',
-      description: 'Perfect for getting started.',
-      price: 'Free',
-      features: [
-        'Access to 3 starter quests',
-        'Basic skill feedback',
-      ],
-      buttonText: 'Start for Free',
-      buttonClass: 'secondary-cta',
-      delay: 200,
-    },
-    {
-      name: 'Adventurer',
-      description: 'For dedicated career explorers.',
-      price: 'Rp 150K',
-      priceUnit: '/year',
-      features: [
-        'Unlimited access to all quests',
-        'Detailed performance reports',
-        'Earn shareable digital badges',
-        'Priority access to new quests',
-      ],
-      buttonText: 'Choose Adventurer',
-      buttonClass: 'cta-gradient cta-button',
-      popular: true,
-      delay: 350,
-    },
-    {
-      name: 'Navigator',
-      description: 'For universities & institutions.',
-      price: "Let's Talk",
-      features: [
-        'Bulk access for students',
-        'Admin dashboard & analytics',
-        'Custom quest development',
-      ],
-      buttonText: 'Contact Sales',
-      buttonClass: 'secondary-cta',
-      delay: 500,
-    },
-  ]
-
+const plans = [
+  {
+    name: 'Explorer',
+    description: 'Sempurna untuk memulai.',
+    price: 'Gratis',
+    features: [
+      'Akses ke 3 simulasi awal',
+      'Laporan keahlian dasar',
+    ],
+    buttonText: 'Coba Gratis',
+    buttonClass: 'secondary-cta',
+    delay: 200,
+  },
+  {
+    name: 'Adventurer',
+    description: 'Untuk eksplorasi karier yang mendalam.',
+    price: 'Rp 150K',
+    priceUnit: '/tahun',
+    features: [
+      'Akses tak terbatas ke semua simulasi',
+      'Laporan performa yang mendetail',
+      'Dapatkan lencana digital profesional',
+      'Akses prioritas untuk simulasi baru',
+    ],
+    buttonText: 'Mulai Eksplorasi',
+    buttonClass: 'cta-gradient cta-button',
+    popular: true,
+    delay: 350,
+  },
+  {
+    name: 'Untuk Institusi',
+    description: 'Bagi universitas & organisasi.',
+    price: 'Hubungi Kami',
+    features: [
+      'Akses terintegrasi untuk mahasiswa',
+      'Dasbor & laporan analitik',
+      'Opsi simulasi yang disesuaikan',
+    ],
+    buttonText: 'Hubungi Tim Sales',
+    buttonClass: 'secondary-cta',
+    delay: 500,
+  },
+]
   return (
     <section id="pricing" className="py-20 md:py-28">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <RevealOnScroll>
             <h2 className="text-3xl md:text-4xl font-bold text-white">
-              Choose Your Path
+              Pilih Jalur Eksplorasimu
             </h2>
           </RevealOnScroll>
           
           <RevealOnScroll delay={150}>
             <p className="mt-4 text-slate-400 max-w-3xl mx-auto">
-              Start for free and upgrade when you're ready to dive deeper. Simple, transparent 
-              pricing for every stage of your journey.
+              Mulai gratis, dan tingkatkan paketmu saat siap untuk eksplorasi lebih dalam.
             </p>
           </RevealOnScroll>
         </div>
@@ -72,7 +70,7 @@ export default function Pricing() {
               <div className={`glass-card p-8 rounded-2xl h-full ${plan.popular ? 'border-2 border-purple-500 relative' : ''}`}>
                 {plan.popular && (
                   <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 px-4 py-1 bg-purple-500 text-white text-sm font-bold rounded-full">
-                    MOST POPULAR
+                    PALING POPULER
                   </div>
                 )}
                 

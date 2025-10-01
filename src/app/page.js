@@ -11,6 +11,7 @@ import FinalCTA from '@/components/sections/FinalCTA'
 import VideoModal from '@/components/ui/VideoModal'
 import BlogModal from '@/components/ui/BlogModal'
 import SplashScreen from '@/components/ui/SplashScreen'
+import Problem from './components/sections/Problem'
 
 export default function Home() {
   const [videoModalOpen, setVideoModalOpen] = useState(false)
@@ -31,6 +32,7 @@ export default function Home() {
       <SocialProof />
       
       <main>
+        <Problem/>
         <Features />
         <Pricing />
         <FinalCTA />
