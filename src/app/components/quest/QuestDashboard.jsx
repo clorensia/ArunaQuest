@@ -1,4 +1,3 @@
-// src/app/components/quest/QuestDashboard.jsx
 import { useGameStore } from '@/store/gameStore';
 
 function QuestDashboard() {
