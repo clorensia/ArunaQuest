@@ -1,5 +1,3 @@
-// src/store/gameStore.js
-
 import { create } from 'zustand';
 
 // DATA & KONSTANTA (Akan dipindah ke API nanti)
