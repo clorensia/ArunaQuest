@@ -9,13 +9,13 @@ export default function Navigation({ onBlogClick }) {
         </Link>
         
         <div className="hidden md:flex items-center space-x-8 text-slate-300">
-            <a href="#problem" className="hover:text-white transition-colors">
+          <a href="/#problem" className="hover:text-white transition-colors">
             Problem
           </a>
-          <a href="#features" className="hover:text-white transition-colors">
+          <a href="/#features" className="hover:text-white transition-colors">
             Features
           </a>
-          <a href="#pricing" className="hover:text-white transition-colors">
+          <a href="/#pricing" className="hover:text-white transition-colors">
             Pricing
           </a>
           <button 

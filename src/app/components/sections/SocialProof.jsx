@@ -1,6 +1,6 @@
 'use client'
 
-import RevealOnScroll from '@/components/animations/RevealOnScroll'
+import RevealOnScroll from '@/app/components/animations/RevealOnScroll'
 
 export default function SocialProof() {
   const companies = [

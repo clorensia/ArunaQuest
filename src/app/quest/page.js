@@ -1,14 +1,14 @@
 'use client';
 
-import React from 'react';
-import { useGameStore, GAME_STATES } from '@/store/gameStore';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useGameStore, GAME_STATES } from '@/app/store/gameStore';
 
-import QuestDashboard from '@/components/quest/QuestDashboard';
-import QuestPlayer from '@/components/quest/QuestPlayer';
-import MiniGamePlayer from '@/components/quest/MiniGamePlayer';
-import FeedbackScreen from '@/components/quest/FeedbackScreen';
-import QuestReport from '@/components/quest/QuestReport';
-import FloatingScore from '@/components/quest/FloatingScore';
+import QuestDashboard from '@/app/components/quest/QuestDashboard';
+import QuestPlayer from '@/app/components/quest/QuestPlayer';
+import MiniGamePlayer from '@/app/components/quest/MiniGamePlayer';
+import FeedbackScreen from '@/app/components/quest/FeedbackScreen';
+import FloatingScore from '@/app/components/quest/FloatingScore';
 
 const LoadingSpinner = () => (
     <div className="flex flex-col items-center justify-center min-h-[70vh]">
@@ -19,6 +19,13 @@ const LoadingSpinner = () => (
 
 export default function QuestPage() {
     const { gameState, currentScenarioId, questData, transientEffect } = useGameStore();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (gameState === GAME_STATES.REPORT) {
+            router.push('/quest/report');
+        }
+    }, [gameState, router]);
 
     const renderContent = () => {
         switch (gameState) {
@@ -31,8 +38,6 @@ export default function QuestPage() {
                 return scenario ? <MiniGamePlayer scenario={scenario} /> : <LoadingSpinner />;
             case GAME_STATES.FEEDBACK:
                 return <FeedbackScreen />;
-            case GAME_STATES.REPORT:
-                return <QuestReport />;
             case GAME_STATES.DASHBOARD:
             default:
                 return <QuestDashboard />;

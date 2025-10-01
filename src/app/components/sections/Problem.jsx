@@ -1,7 +1,7 @@
 'use client'
 
-import { Compass, Users, Shield, FileText } from 'lucide-react'
-import RevealOnScroll from '@/components/animations/RevealOnScroll'
+import { Compass, Users, Shield, FileText, GraduationCap } from 'lucide-react'
+import RevealOnScroll from '@/app/components/animations/RevealOnScroll'
 
 export default function Problem() {
   const problems = [
@@ -29,10 +29,16 @@ export default function Problem() {
       description: 'Deskripsi pekerjaan tidak menggambarkan keseharian yang sebenarnya.',
       delay: 500,
     },
+    {
+      icon: GraduationCap, 
+      iconColor: 'text-amber-400',
+      description: 'Merasa skill yang dipelajari di bangku kuliah kurang relevan untuk dunia kerja.', // <-- MASALAH BARU
+      delay: 600,
+    },
   ]
 
   return (
-    <section id="problem" className="py-20 md:py-28">
+    <section id="problem" className="py-20 md:py-28 mb-4 ">
       <div className="container mx-auto px-6 text-center">
         <RevealOnScroll>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
@@ -41,15 +47,17 @@ export default function Problem() {
         </RevealOnScroll>
         
         <RevealOnScroll delay={150}>
-          <p className="text-slate-400 max-w-2xl mx-auto mb-12">
-            Jika iya, kamu tidak sendirian. Ini adalah tantangan yang sering dialami:
+          <p className="text-slate-400 max-w-2xl mx-auto mb-16">
+            Jika iya, kamu tidak sendirian. Ini adalah tantangan yang sering dialami banyak orang saat merencanakan karier:
           </p>
         </RevealOnScroll>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Penyesuaian Grid untuk 5 item */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-4">
           {problems.map((problem, index) => (
             <RevealOnScroll key={index} delay={problem.delay}>
-              <div className="glass-card p-8 rounded-xl h-full flex flex-col items-center justify-start min-h-[240px]">
+              {/* Menambahkan class 'lg:col-span-1' untuk memastikan setiap item mengambil 1 kolom di layar besar */}
+              <div className="glass-card p-8 rounded-xl h-full flex flex-col items-center justify-start min-h-[240px] lg:col-span-1">
                 <problem.icon className={`w-16 h-16 mx-auto ${problem.iconColor} mb-6`} />
                 <p className="font-medium text-slate-300 text-base leading-relaxed">
                   {problem.description}

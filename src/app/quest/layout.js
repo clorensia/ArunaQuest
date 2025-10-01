@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import BlogModal from '@/components/ui/BlogModal';
+import Navigation from '@/app/components/layout/Navigation';
+import Footer from '@/app/components/layout/Footer';
+import BlogModal from '@/app/components/ui/BlogModal';
 
 export default function QuestLayout({ children }) {
   const [blogModalOpen, setBlogModalOpen] = useState(false);

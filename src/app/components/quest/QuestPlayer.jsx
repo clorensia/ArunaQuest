@@ -1,4 +1,6 @@
-import { useGameStore } from '@/store/gameStore';
+'use client'
+
+import { useGameStore } from '@/app/store/gameStore';
 
 function VisualNovelScene({ scenario, onChoice, progress, scenarioIndex, totalScenarios, onExit }) {
     const { title, narrative, choices } = scenario;

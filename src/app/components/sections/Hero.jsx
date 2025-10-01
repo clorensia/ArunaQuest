@@ -1,7 +1,8 @@
 'use client'
 
 import { PlayCircle } from 'lucide-react'
-import RevealOnScroll from '@/components/animations/RevealOnScroll'
+import RevealOnScroll from '@/app/components/animations/RevealOnScroll'
+import Link from 'next/link' 
 
 export default function Hero({ onVideoClick }) {
     return (
@@ -22,12 +23,13 @@ export default function Hero({ onVideoClick }) {
 
                 <RevealOnScroll delay={300}>
                     <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-                        <a
-                            href="#"
+                        {/* 2. Ubah 'a' menjadi 'Link' dan href menjadi '/quest' */}
+                        <Link
+                            href="/quest"
                             className="cta-gradient text-white font-bold text-lg px-8 py-4 rounded-xl shadow-lg cta-button inline-block w-full sm:w-auto"
                         >
                             Coba Simulasi Gratis
-                        </a>
+                        </Link>
 
                         <button
                             onClick={onVideoClick}

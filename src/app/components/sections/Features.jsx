@@ -1,7 +1,7 @@
 'use client'
 
 import { Briefcase, TrendingUp, Award } from 'lucide-react'
-import RevealOnScroll from '@/components/animations/RevealOnScroll'
+import RevealOnScroll from '@/app/components/animations/RevealOnScroll'
 
 export default function Features() {
     const features = [

@@ -1,7 +1,7 @@
 'use client'
 
 import { CheckCircle } from 'lucide-react'
-import RevealOnScroll from '@/components/animations/RevealOnScroll'
+import RevealOnScroll from '@/app/components/animations/RevealOnScroll'
 
 export default function Pricing() {
 const plans = [

@@ -1,4 +1,6 @@
-import { useGameStore } from '@/store/gameStore';
+'use client'
+
+import { useGameStore } from '@/app/store/gameStore';
 
 function QuestDashboard() {
     const { startQuest, loadSavedGame, error, allQuests } = useGameStore();

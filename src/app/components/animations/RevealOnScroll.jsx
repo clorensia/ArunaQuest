@@ -2,31 +2,42 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-export default function RevealOnScroll({ children, delay = 0 }) {
+export default function RevealOnScroll({ 
+  children, 
+  delay = 0, 
+  threshold = 0.1, 
+  triggerOnce = true 
+}) {
   const [isVisible, setIsVisible] = useState(false)
   const elementRef = useRef(null)
 
   useEffect(() => {
+    const element = elementRef.current
+    if (!element) return
+
     const observer = new IntersectionObserver(
       ([entry]) => {
+        // Jika elemen terlihat di layar
         if (entry.isIntersecting) {
           setIsVisible(true)
+          // Jika animasi hanya perlu dijalankan sekali, hentikan pengamatan
+          if (triggerOnce) {
+            observer.unobserve(element)
+          }
         }
       },
-      { threshold: 0.1 }
+      { 
+        threshold,
+      }
     )
 
-    const currentElement = elementRef.current
-    if (currentElement) {
-      observer.observe(currentElement)
-    }
+    observer.observe(element)
 
+    // Cleanup function untuk berhenti mengamati saat komponen di-unmount
     return () => {
-      if (currentElement) {
-        observer.unobserve(currentElement)
-      }
+      observer.unobserve(element)
     }
-  }, [])
+  }, [threshold, triggerOnce]) // Jalankan ulang efek jika prop ini berubah
 
   return (
     <div

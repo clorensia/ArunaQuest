@@ -1,17 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import Navigation from '@/components/layout/Navigation'
-import Footer from '@/components/layout/Footer'
-import Hero from '@/components/sections/Hero'
-import SocialProof from '@/components/sections/SocialProof'
-import Features from '@/components/sections/Features'
-import Pricing from '@/components/sections/Pricing'
-import FinalCTA from '@/components/sections/FinalCTA'
-import VideoModal from '@/components/ui/VideoModal'
-import BlogModal from '@/components/ui/BlogModal'
-import SplashScreen from '@/components/ui/SplashScreen'
-import Problem from './components/sections/Problem'
+import Navigation from '@/app/components/layout/Navigation'
+import Footer from '@/app/components/layout/Footer'
+import Hero from '@/app/components/sections/Hero'
+import SocialProof from '@/app/components/sections/SocialProof'
+import Features from '@/app/components/sections/Features'
+import Pricing from '@/app/components/sections/Pricing'
+import FinalCTA from '@/app/components/sections/FinalCTA'
+import VideoModal from '@/app/components/ui/VideoModal'
+import BlogModal from '@/app/components/ui/BlogModal'
+import SplashScreen from '@/app/components/ui/SplashScreen'
+import Problem from '@/app/components/sections/Problem'
 
 export default function Home() {
   const [videoModalOpen, setVideoModalOpen] = useState(false)
