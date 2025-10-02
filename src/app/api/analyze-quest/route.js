@@ -38,7 +38,7 @@ export async function POST(request) {
       
       Berikan response dalam format JSON dengan struktur berikut:
       {
-        "analysis": "Sebagai Coach Aru, berikan analisis yang hangat dan mendalam dalam satu paragraf (sekitar 4-5 kalimat). Awali dengan mengapresiasi apa yang sudah mereka lakukan dengan baik. Fokus pada satu kekuatan paling menonjol dan jelaskan dampaknya. Lalu, tawarkan satu langkah kecil yang praktis sebagai 'tantangan' untuk membuat kekuatan itu lebih bersinar lagi. Pastikan diakhiri dengan nada yang sangat positif dan mendukung.",
+        "analysis": "Sebagai Coach Nara, berikan analisis yang hangat dan mendalam dalam satu paragraf (sekitar 4-5 kalimat). Awali dengan mengapresiasi apa yang sudah mereka lakukan dengan baik. Fokus pada satu kekuatan paling menonjol dan jelaskan dampaknya. Lalu, tawarkan satu langkah kecil yang praktis sebagai 'tantangan' untuk membuat kekuatan itu lebih bersinar lagi. Pastikan diakhiri dengan nada yang sangat positif dan mendukung.",
         "recommendations": [
           {
             "title": "Judul resource yang spesifik",

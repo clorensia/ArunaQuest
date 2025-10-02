@@ -1,6 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { useGameStore } from '@/app/store/gameStore';
+import Link from 'next/link'; // Impor komponen Link
 
 function QuestDashboard() {
     const { 
@@ -73,7 +74,7 @@ function QuestDashboard() {
         <div className="max-w-6xl mx-auto px-4 py-8">
             <div className="text-center mb-12">
                 <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
-                    Quest Dashboard
+                    Selamat Datang di Aruna Quest
                 </h1>
                 <p className="text-xl text-slate-400">
                     Pilih petualanganmu dan mulai berkembang!
@@ -122,6 +123,16 @@ function QuestDashboard() {
                     </div>
                 ))}
             </div>
+
+            <div className="text-center mt-12">
+                <Link
+                    href="/"
+                    className="secondary-cta text-white font-bold text-lg px-8 py-4 rounded-xl shadow-lg inline-flex items-center justify-center gap-2 w-full sm:w-auto"
+                >
+                    &larr; Kembali ke Halaman Utama
+                </Link>
+            </div>
+
         </div>
     );
 }
