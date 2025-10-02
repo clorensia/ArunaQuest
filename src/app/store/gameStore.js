@@ -18,6 +18,7 @@ export const STATS = {
   INISIATIF: 'inisiatif',
 };
 
+// Fungsi baru untuk memanggil "jembatan" API kita
 const generateQuestFromAPI = async (questId) => {
   const response = await fetch('/api/generate-quest', {
     method: 'POST',
@@ -44,11 +45,14 @@ export const useGameStore = create(
       lastFeedback: null,
       error: null,
       isLoadingQuests: true,
+      pendingNextScenarioId: null,
+      transientEffect: null,
       
       // ACTIONS
       setGameState: (gameState) => set({ gameState }),
 
       fetchAllQuests: () => {
+        // Daftar quest yang tersedia sekarang statis, hanya untuk ditampilkan di dashboard
         const availableQuests = {
           'product-manager': { id: 'product-manager', title: 'A Day as a Product Manager', description: 'Navigasi permintaan, dilema prioritas, dan konflik tim.' },
           'ui-ux-designer': { id: 'ui-ux-designer', title: 'A Day as a UI/UX Designer', description: 'Hadapi brief tidak jelas dan kendala teknis.' },
@@ -60,19 +64,14 @@ export const useGameStore = create(
       startQuest: async (questId) => {
         set({ gameState: GAME_STATES.LOADING, error: null });
         try {
-          console.log(`Memulai generate quest untuk: ${questId}`);
           const data = await generateQuestFromAPI(questId);
-          console.log("Quest berhasil di-generate:", data);
 
           if (!data || !data.scenarios) {
               throw new Error("Data quest yang diterima dari AI tidak valid.");
           }
-
-          const totalScenarios = Object.keys(data.scenarios).length;
-          const questDataWithTotal = { ...data, totalScenarios };
-
+          
           set({
-            questData: questDataWithTotal,
+            questData: data,
             stats: { ...data.initialStats },
             currentScenarioId: data.startScenarioId,
             currentScenarioIndex: 1,
@@ -81,7 +80,7 @@ export const useGameStore = create(
         } catch (error) {
           console.error('Error starting quest:', error);
           set({
-            error: `Gagal memuat quest dari AI: ${error.message}`,
+            error: `Gagal memuat quest: ${error.message}`,
             gameState: GAME_STATES.DASHBOARD,
           });
         }
@@ -89,17 +88,19 @@ export const useGameStore = create(
 
       handleChoice: (choice) => {
         const { effect, feedback, nextSceneId } = choice;
+        const newStats = { ...get().stats };
+        newStats[STATS.TEKNIS] += (effect.teknis || 0);
+        newStats[STATS.SOSIAL] += (effect.sosial || 0);
+        newStats[STATS.INISIATIF] += (effect.inisiatif || 0);
 
-        set((state) => ({
-          stats: {
-            [STATS.TEKNIS]: state.stats[STATS.TEKNIS] + (effect.teknis || 0),
-            [STATS.SOSIAL]: state.stats[STATS.SOSIAL] + (effect.sosial || 0),
-            [STATS.INISIATIF]: state.stats[STATS.INISIATIF] + (effect.inisiatif || 0),
-          },
+        set({
+          stats: newStats,
           lastFeedback: { effect, feedback },
           gameState: GAME_STATES.FEEDBACK,
           pendingNextScenarioId: nextSceneId,
-        }));
+          transientEffect: effect,
+        });
+        setTimeout(() => set({ transientEffect: null }), 1000);
       },
       
       advanceToNextScenario: () => {
@@ -110,37 +111,25 @@ export const useGameStore = create(
         }
 
         const nextScenario = get().questData.scenarios[nextSceneId];
-        if (nextScenario.type === 'minigame') {
-          set({
-            currentScenarioId: nextSceneId,
-            currentScenarioIndex: get().currentScenarioIndex + 1,
-            gameState: GAME_STATES.MINIGAME,
-            lastFeedback: null,
-          });
-        } else {
-          set({
-            currentScenarioId: nextSceneId,
-            currentScenarioIndex: get().currentScenarioIndex + 1,
-            gameState: GAME_STATES.PLAYING,
-            lastFeedback: null,
-          });
-        }
+        const newGameState = nextScenario?.type === 'minigame' ? GAME_STATES.MINIGAME : GAME_STATES.PLAYING;
+        
+        set((state) => ({
+          currentScenarioId: nextSceneId,
+          currentScenarioIndex: state.currentScenarioIndex + 1,
+          gameState: newGameState,
+          lastFeedback: null,
+        }));
       },
 
       completeMinigame: (minigameEffect, feedback, nextSceneId) => {
-        set((state) => ({
-            stats: {
-                [STATS.TEKNIS]: state.stats[STATS.TEKNIS] + (minigameEffect.teknis || 0),
-                [STATS.SOSIAL]: state.stats[STATS.SOSIAL] + (minigameEffect.sosial || 0),
-                [STATS.INISIATIF]: state.stats[STATS.INISIATIF] + (minigameEffect.inisiatif || 0),
-            },
-            lastFeedback: { effect: minigameEffect, feedback },
-            gameState: GAME_STATES.FEEDBACK,
-            pendingNextScenarioId: nextSceneId,
-        }));
+        get().handleChoice({ effect: minigameEffect, feedback, nextSceneId });
       },
       
       endQuest: () => {
+        const { questData, stats } = get();
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.setItem('lastQuestReport', JSON.stringify({ questData, stats }));
+        }
         set({ gameState: GAME_STATES.REPORT });
       },
 
@@ -158,7 +147,10 @@ export const useGameStore = create(
     }),
     {
       name: 'arunaquest-storage',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => sessionStorage), // Ganti ke sessionStorage agar tidak tersimpan selamanya
+      partialize: (state) => ({
+        // Hanya simpan state yang aman untuk disimpan
+      }),
     }
   )
 );
