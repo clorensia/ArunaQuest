@@ -126,7 +126,6 @@ function QuestReport({ stats, questData, onBackToDashboard }) {
                     )}
                 </div>
 
-                {/* Stats Breakdown */}
                 <div className="glass-card p-6 mb-8">
                     <h3 className="text-xl font-bold text-white mb-6 text-center">Detail Skor</h3>
                     <div className="space-y-6">
@@ -148,7 +147,6 @@ function QuestReport({ stats, questData, onBackToDashboard }) {
                     </div>
                 </div>
 
-                {/* Dynamic + Static Recommendations */}
                 {allRecommendations.length > 0 && (
                     <div className="mb-10">
                         <h3 className="text-xl font-bold text-white mb-4 text-center">

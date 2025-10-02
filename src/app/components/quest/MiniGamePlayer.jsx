@@ -7,10 +7,8 @@ function MiniGamePlayer({ scenario }) {
     const { completeMinigame } = useGameStore();
     const { title, narrative, minigameData } = scenario;
 
-    // --- State untuk semua jenis minigame ---
     const [items, setItems] = useState(() => minigameData.items ? [...minigameData.items] : []);
     
-    // State khusus untuk 'categorization' & 'layouting'
     const [unCategorized, setUnCategorized] = useState(() => minigameData.type === 'categorization' ? [...minigameData.items] : []);
     const [categorized, setCategorized] = useState(() => {
         if (minigameData.type !== 'categorization') return {};
@@ -19,17 +17,14 @@ function MiniGamePlayer({ scenario }) {
         return initialState;
     });
 
-    // --- Refs untuk menangani logika drag-and-drop ---
     const draggedItem = useRef(null);
     const draggedOverItem = useRef(null);
     const draggedSource = useRef(null);
 
-    // --- Fungsi Handler untuk Drag-and-Drop ---
 
     const handleDragStart = (e, item, source, index = null) => {
         draggedItem.current = { item, index, source };
         e.dataTransfer.effectAllowed = 'move';
-        // Memberi sedikit jeda agar browser bisa "mengambil" elemen yang di-drag
         setTimeout(() => e.target.classList.add('dragging'), 0);
     };
 
@@ -47,7 +42,6 @@ function MiniGamePlayer({ scenario }) {
         e.preventDefault();
     };
 
-    // Fungsi utama yang menangani logika saat item dijatuhkan
     const handleDrop = (e, dropZone) => {
         e.preventDefault();
 
@@ -65,9 +59,7 @@ function MiniGamePlayer({ scenario }) {
             return;
         }
 
-        // --- LOGIKA UNTUK CATEGORIZATION ---
         if (minigameData.type === 'categorization') {
-            // Hapus dari source
             if (source === 'pool') {
                 setUnCategorized(prev => prev.filter(i => i.id !== item.id));
             } else {
@@ -76,7 +68,6 @@ function MiniGamePlayer({ scenario }) {
                     [source]: prev[source].filter(i => i.id !== item.id)
                 }));
             }
-            // Tambahkan ke target
             if (dropZone === 'pool') {
                 setUnCategorized(prev => [...prev, item]);
             } else {
@@ -108,7 +99,6 @@ function MiniGamePlayer({ scenario }) {
         completeMinigame(userAnswer, minigameData);
     };
 
-    // --- FUNGSI UNTUK MERENDER TAMPILAN MINIGAME ---
     const renderGame = () => {
         switch (minigameData.type) {
             case 'spot_the_error':

@@ -124,3 +124,17 @@
 .animate-marquee {
   animation: marquee 30s linear infinite;
 }
+
+/* Blink Animation for Available Quest */
+@keyframes blink {
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-blink {
+  animation: blink 1.5s linear infinite;
+}

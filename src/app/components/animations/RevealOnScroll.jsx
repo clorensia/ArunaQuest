@@ -17,10 +17,8 @@ export default function RevealOnScroll({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Jika elemen terlihat di layar
         if (entry.isIntersecting) {
           setIsVisible(true)
-          // Jika animasi hanya perlu dijalankan sekali, hentikan pengamatan
           if (triggerOnce) {
             observer.unobserve(element)
           }
@@ -33,12 +31,10 @@ export default function RevealOnScroll({
 
     observer.observe(element)
 
-    // Cleanup function untuk berhenti mengamati saat komponen di-unmount
     return () => {
       observer.unobserve(element)
     }
-  }, [threshold, triggerOnce]) // Jalankan ulang efek jika prop ini berubah
-
+  }, [threshold, triggerOnce]) 
   return (
     <div
       ref={elementRef}

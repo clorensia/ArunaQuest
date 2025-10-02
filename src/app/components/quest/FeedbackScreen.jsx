@@ -4,9 +4,7 @@ import { useGameStore } from '@/app/store/gameStore';
 function FeedbackScreen() {
     const lastChoiceFeedback = useGameStore(state => state.lastChoiceFeedback);
     
-    // HAPUS useEffect auto-advance karena sudah dihandle di gameStore
-    // Biarkan hanya menampilkan feedback
-    
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center animate-in fade-in duration-500">
             <div className="max-w-2xl w-full glass-card p-8">

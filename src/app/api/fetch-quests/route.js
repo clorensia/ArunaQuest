@@ -1,4 +1,3 @@
-// file: src/app/api/fetch-quests/route.js
 import { NextResponse } from 'next/server';
 
 const MOCK_API_URL = 'https://68dd8567d7b591b4b78cb159.mockapi.io/api/v1/quests';

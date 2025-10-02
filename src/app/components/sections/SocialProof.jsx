@@ -7,7 +7,8 @@ export default function SocialProof() {
     'Skillvul',
     'Perempuan Inovasi',
     'Yayasan Dian Sastro',
-    'Markoding'
+    'Markoding',
+    'Magnifique'
   ]
 
   return (
