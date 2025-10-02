@@ -1,11 +1,5 @@
 'use client'
 import React from 'react';
-import { useGameStore } from '@/store/gameStore';
-import FloatingScore from './FloatingScore';
-import MiniGamePlayer from './MiniGamePlayer';
-import QuestPlayer from './QuestPlayer';
-import QuestDashboard from './QuestDashboard';
-import FeedbackScreen from './FeedbackScreen';
 
 const getBadge = (stats) => {
     const sortedStats = Object.entries(stats).sort(([,a],[,b]) => b - a);
