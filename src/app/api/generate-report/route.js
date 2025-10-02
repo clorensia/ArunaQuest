@@ -1,91 +1,73 @@
-// file: src/app/api/generate-report/route.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function POST(request) {
   if (!process.env.GEMINI_API_KEY) {
-    return Response.json({ error: "Konfigurasi server salah." }, { status: 500 });
+    return new Response(JSON.stringify({ error: "Konfigurasi server salah." }), { status: 500 });
   }
 
   try {
     const { finalStats, questTitle } = await request.json();
-    
     if (!finalStats || !questTitle) {
-      return Response.json({ error: "Data skor tidak lengkap." }, { status: 400 });
+      return new Response(JSON.stringify({ error: "Data skor tidak lengkap." }), { status: 400 });
     }
 
-    if (typeof finalStats.teknis === 'undefined' || 
-        typeof finalStats.sosial === 'undefined' || 
-        typeof finalStats.inisiatif === 'undefined') {
-      return Response.json({ error: "Format data skor tidak valid." }, { status: 400 });
-    }
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-latest",
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 300,
-      }
-    });
-
-    // Prompt yang lebih sederhana dan jelas
+    // PROMPT PREMIUM YANG SUDAH DIPERBAIKI
     const prompt = `
-Role: Kamu adalah "Coach Nara", career coach muda dan friendly di game ArunaQuest.
-Tone: Casual tapi profesional, seperti teman yang berpengalaman di dunia kerja.
+You are "Coach Nara," a young, dynamic AI Career Coach in the simulation game ArunaQuest. Your persona is that of a knowledgeable insider in the professional world who communicates like a supportive and relatable friend. Your tone is: professional yet casual, encouraging, and direct—like a mentor giving real talk over bubble tea.
 
-Data Quest:
-- Judul: "${questTitle}"
-- Skor Teknis: ${finalStats.teknis}
-- Skor Sosial: ${finalStats.sosial}  
-- Skor Inisiatif: ${finalStats.inisiatif}
+A player has just completed the Quest: "${questTitle}".
 
-Tugas: Tulis analisis performa SINGLE PARAGRAPH dalam Bahasa Indonesia dengan format:
-1. Awali dengan selamat untuk quest yang diselesaikan
-2. Puji area dengan skor tertinggi (jelaskan kenapa ini penting)
-3. Beri saran singkat untuk area dengan skor terendah (framing positif)
-4. Akhiri dengan motivasi untuk quest berikutnya
+Their final soft skill scores are:
+- Technical: ${finalStats.teknis}
+- Social: ${finalStats.sosial}
+- Initiative: ${finalStats.inisiatif}
 
-Rules: 
-- MAX 4 kalimat
-- Bahasa Indonesia casual dan natural
-- NO JSON, NO markdown, HANYA plain text
-- Jangan sebut angka skor, tapi sebut sebagai "tinggi", "kuat", "baik", dll.
+Your Task: Write a single, cohesive performance analysis paragraph in Indonesian.
 
-Output:`.trim();
+Critical Tone & Style Guidelines:
+1.  Start with Context: Begin by naturally referencing the quest they just finished. Make the player feel like the quest was a real experience.
+2.  Praise with Impact: For the highest score, don't just state it. Explain *why* it's a strength in the context of their professional journey. Use specific, believable praise.
+3.  Frame Growth as an Opportunity: For the lowest score, frame it as a "area yang bisa dikasih perhatian lebih" (an area that could use more attention) or "peluang seru buat berkembang" (an exciting opportunity to grow). Offer a tiny, practical hint—not a full lecture.
+4.  Motivate Like a Friend: End with a motivational line that feels genuine and pushes them to take on the next challenge. Avoid clichés.
+5.  Language: Use modern, conversational Indonesian. Sprinkle in professional terms when needed, but keep the overall flow natural and engaging.
 
-    console.log('Generating analysis for:', questTitle);
+Output Format: Return ONLY a raw text string. No JSON, no markdown, no additional formatting. Just the pure paragraph.
+    `.trim();
 
     const result = await model.generateContent(prompt);
-    const response = result.response;
-    let analysisText = response.text().trim();
+    const response = await result.response;
+    const analysisText = response.text().trim();
 
-    // Cleanup response yang lebih agresif
-    analysisText = analysisText
-      .replace(/^["']|["']$/g, '') // Remove quotes
-      .replace(/^\{.*?"analysis":\s*"|"\s*\}$/g, '') // Remove JSON artifacts
-      .replace(/```(json)?/g, '') // Remove code blocks
-      .trim();
-
-    // Fallback jika response masih aneh
-    if (!analysisText || analysisText.length < 20) {
-      analysisText = `Selamat menyelesaikan quest "${questTitle}"! Performa kamu sudah baik, tetap semangat untuk pengembangan skill berikutnya!`;
+    let cleanAnalysis = analysisText;
+    
+    if (cleanAnalysis.startsWith('"') && cleanAnalysis.endsWith('"')) {
+      cleanAnalysis = cleanAnalysis.slice(1, -1);
+    }
+    
+    if (cleanAnalysis.startsWith('{') && cleanAnalysis.includes('analysis')) {
+      try {
+        const parsed = JSON.parse(cleanAnalysis);
+        cleanAnalysis = parsed.analysis || analysisText;
+      } catch (e) {
+      }
     }
 
-    console.log('Successfully generated analysis');
-
-    return Response.json({ 
-      analysis: analysisText 
+    return new Response(JSON.stringify({ 
+      analysis: cleanAnalysis 
+    }), {
+      headers: { 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error("API Error:", error);
-    
-    // Return error yang konsisten sebagai JSON
-    return Response.json({ 
-      error: "Gagal menghasilkan analisis. Silakan coba lagi." 
-    }, { 
-      status: 500 
+    console.error("Error di generate-report:", error);
+    return new Response(JSON.stringify({ 
+      error: `Gagal menghasilkan analisis dari AI: ${error.message}` 
+    }), {
+      status: 500,
     });
   }
 }

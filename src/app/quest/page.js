@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGameStore, GAME_STATES } from '@/app/store/gameStore';
@@ -25,8 +24,13 @@ export default function QuestPage() {
 
     // Handle navigation to report page
     useEffect(() => {
+        console.log('🎮 QuestPage - Game State:', gameState);
+        
         if (gameState === GAME_STATES.REPORT) {
-            router.push('/quest/report');
+            console.log('📊 Navigating to report page...');
+            
+            // Use replace to prevent back navigation issues
+            router.replace('/quest/report');
         }
     }, [gameState, router]);
 
@@ -36,18 +40,25 @@ export default function QuestPage() {
                 return <LoadingSpinner />;
             
             case GAME_STATES.PLAYING:
+                if (!questData || !currentScenarioId) {
+                    return <LoadingSpinner />;
+                }
                 return <QuestPlayer />;
             
             case GAME_STATES.MINIGAME:
                 const scenario = questData?.scenarios?.[currentScenarioId];
-                return scenario ? (
-                    <MiniGamePlayer scenario={scenario} />
-                ) : (
-                    <LoadingSpinner />
-                );
+                if (!scenario) {
+                    console.error('Scenario not found for minigame');
+                    return <LoadingSpinner />;
+                }
+                return <MiniGamePlayer scenario={scenario} />;
             
             case GAME_STATES.FEEDBACK:
                 return <FeedbackScreen />;
+            
+            case GAME_STATES.REPORT:
+                // Show loading while navigating
+                return <LoadingSpinner />;
             
             case GAME_STATES.DASHBOARD:
             default:

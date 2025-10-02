@@ -1,117 +1,127 @@
-'use client'
-
+'use client';
 import { useEffect } from 'react';
 import { useGameStore } from '@/app/store/gameStore';
 
-// Fallback descriptions jika API return ellipsis
-const QUEST_DESCRIPTIONS = {
-    'backend-engineer-day-v1': 'Hadapi dilema antara kecepatan dan kualitas saat membangun sebuah fitur, lalu komunikasikan risikonya kepada tim.',
-    'ui-ux-designer-day-v1': 'Hadapi brief yang tidak jelas, sintesis data riset, dan negosiasi kendala teknis saat merancang fitur baru.',
-    'product-manager-day-v1': 'Navigasi permintaan mendadak dari CEO, dilema prioritas, dan konflik tim untuk menjaga roadmap tetap berjalan.'
-};
-
 function QuestDashboard() {
     const { 
-        startQuest, 
-        loadSavedGame, 
-        fetchAllQuests,
+        allQuests, 
+        isLoadingQuests, 
         error, 
-        allQuests,
-        isLoadingQuests 
+        fetchAllQuests, 
+        startQuest 
     } = useGameStore();
-    
-    const hasSavedGame = false; // You can add logic to check localStorage for saved game
 
-    // Fetch quests on component mount
     useEffect(() => {
-        fetchAllQuests();
-    }, [fetchAllQuests]);
-
-    // Helper function to get full description
-    const getFullDescription = (quest) => {
-        // If description has ellipsis or is too short, use fallback
-        if (!quest.description || quest.description.includes('…') || quest.description.length < 30) {
-            return QUEST_DESCRIPTIONS[quest.id] || quest.description || 'Deskripsi tidak tersedia';
+        // Fetch quests on mount if not already loaded
+        if (Object.keys(allQuests).length === 0 && !error) {
+            fetchAllQuests();
         }
-        return quest.description;
-    };
+    }, []);
 
-    return (
-        <div className="p-6 md:p-8 flex flex-col items-center w-full">
-            <div className="mb-12 text-center max-w-2xl">
-                <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
-                    Pilih Petualanganmu
-                </h1>
-                <p className="text-lg text-slate-400">
-                    Uji kemampuanmu melalui skenario interaktif dan temukan potensimu.
+    if (isLoadingQuests) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[70vh]">
+                <div className="loader"></div>
+                <p className="text-xl font-medium mt-6 text-slate-400">
+                    Memuat daftar quest...
                 </p>
             </div>
+        );
+    }
 
-            {hasSavedGame && (
-                <button 
-                    onClick={loadSavedGame} 
-                    className="mb-8 cta-gradient text-white font-semibold py-3 px-8 rounded-lg shadow-lg cta-button"
-                >
-                    Lanjutkan Quest Tersimpan
-                </button>
-            )}
-
-            {error && (
-                <div className="bg-rose-500/20 border border-rose-500 text-rose-300 p-4 rounded-lg mb-6 w-full max-w-md">
-                    <p className="font-semibold">Terjadi Kesalahan</p>
-                    <p>{error}</p>
-                </div>
-            )}
-
-            {isLoadingQuests ? (
-                <div className="flex flex-col items-center justify-center min-h-[40vh]">
-                    <div className="loader"></div>
-                    <p className="text-xl font-medium mt-6 text-slate-400">
-                        Memuat daftar quest...
-                    </p>
-                </div>
-            ) : Object.keys(allQuests).length === 0 ? (
-                <div className="text-center py-12">
-                    <p className="text-xl text-slate-400 mb-2">
-                        Belum ada quest tersedia.
-                    </p>
-                    <p className="text-slate-500 mb-6">
-                        Silakan coba lagi atau hubungi administrator.
-                    </p>
-                    <button 
-                        onClick={fetchAllQuests}
-                        className="cta-gradient text-white font-semibold py-3 px-8 rounded-lg cta-button"
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
+                <div className="glass-card p-8 max-w-md text-center">
+                    <div className="text-5xl mb-4">⚠️</div>
+                    <h2 className="text-xl font-bold text-white mb-2">Terjadi Kesalahan</h2>
+                    <p className="text-slate-400 mb-6">{error}</p>
+                    <button
+                        onClick={() => fetchAllQuests()}
+                        className="cta-gradient text-white font-bold py-3 px-6 rounded-lg cta-button"
                     >
                         Coba Lagi
                     </button>
                 </div>
-            ) : (
-                <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {Object.values(allQuests).map(quest => (
-                        <div 
-                            key={quest.id} 
-                            className="glass-card p-6 flex flex-col h-full hover:scale-105 transition-transform duration-300"
-                        >
-                            <h2 className="text-xl font-bold text-white mb-3">
-                                {quest.title}
-                            </h2>
-                            <p className="text-slate-400 mb-6 flex-grow text-sm leading-relaxed">
-                                {getFullDescription(quest)}
-                            </p>
-                            <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
-                                <span>⏱️ ~15 menit</span>
-                                <span>📊 4 skenario</span>
-                            </div>
-                            <button 
-                                onClick={() => startQuest(quest.id)} 
-                                className="w-full cta-gradient text-white font-bold py-3 px-4 rounded-lg cta-button"
-                            >
-                                Mulai Quest
-                            </button>
-                        </div>
-                    ))}
+            </div>
+        );
+    }
+
+    const questList = Object.entries(allQuests);
+
+    if (questList.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
+                <div className="glass-card p-8 max-w-md text-center">
+                    <div className="text-5xl mb-4">📭</div>
+                    <h2 className="text-xl font-bold text-white mb-2">Tidak Ada Quest</h2>
+                    <p className="text-slate-400 mb-6">
+                        Belum ada quest yang tersedia saat ini.
+                    </p>
+                    <button
+                        onClick={() => fetchAllQuests()}
+                        className="cta-gradient text-white font-bold py-3 px-6 rounded-lg cta-button"
+                    >
+                        Refresh
+                    </button>
                 </div>
-            )}
+            </div>
+        );
+    }
+
+    return (
+        <div className="max-w-6xl mx-auto px-4 py-8">
+            <div className="text-center mb-12">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
+                    Quest Dashboard
+                </h1>
+                <p className="text-xl text-slate-400">
+                    Pilih petualanganmu dan mulai berkembang!
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {questList.map(([questId, quest]) => (
+                    <div
+                        key={questId}
+                        className="glass-card p-6 hover:border-purple-500 transition-all cursor-pointer group"
+                        onClick={() => startQuest(questId)}
+                    >
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="text-4xl">{quest.icon || '🎯'}</div>
+                            <div className="flex-1">
+                                <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">
+                                    {quest.title || questId}
+                                </h3>
+                            </div>
+                        </div>
+
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-3">
+                            {quest.description || 'Mulai petualangan ini untuk mempelajari lebih lanjut.'}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {quest.tags?.map((tag, idx) => (
+                                <span
+                                    key={idx}
+                                    className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm text-slate-500">
+                            <span>
+                                {Object.keys(quest.scenarios || {}).length} Skenario
+                            </span>
+                            <span className="text-purple-400 font-medium group-hover:underline">
+                                Mulai →
+                            </span>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

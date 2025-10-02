@@ -1,156 +1,290 @@
-// file: src/app/store/gameStore.js (KODE LENGKAP PENGGANTI)
+// file: src/app/store/gameStore.js
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 
 export const GAME_STATES = {
-  SPLASH: 'SPLASH',
-  DASHBOARD: 'DASHBOARD',
-  LOADING: 'LOADING',
-  PLAYING: 'PLAYING',
-  FEEDBACK: 'FEEDBACK',
-  MINIGAME: 'MINIGAME',
-  REPORT: 'REPORT',
+    DASHBOARD: 'dashboard',
+    LOADING: 'loading',
+    PLAYING: 'playing',
+    FEEDBACK: 'feedback',
+    REPORT: 'report',
+    MINIGAME: 'minigame',
 };
 
-export const STATS = {
-  TEKNIS: 'teknis',
-  SOSIAL: 'sosial',
-  INISIATIF: 'inisiatif',
+const safeLocalStorage = {
+    getItem: (key) => (typeof window !== 'undefined' ? localStorage.getItem(key) : null),
+    setItem: (key, value) => { if (typeof window !== 'undefined') localStorage.setItem(key, value); },
+    removeItem: (key) => { if (typeof window !== 'undefined') localStorage.removeItem(key); }
 };
 
-// Fungsi baru untuk memanggil "jembatan" API kita
-const generateQuestFromAPI = async (questId) => {
-  const response = await fetch('/api/generate-quest', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ questId }),
-  });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Gagal berkomunikasi dengan server ArunaQuest.');
-  }
-  return await response.json();
+const validateMiniGame = (type, userAnswer, minigameData) => {
+    switch (type) {
+        case 'spot_the_error':
+            return userAnswer.selectedLine?.toString() === minigameData.correctAnswer?.toString();
+        case 'prioritization':
+        case 'flow_chart':
+            const userOrder = userAnswer.items?.map(item => item.id);
+            return JSON.stringify(userOrder) === JSON.stringify(minigameData.correctOrder);
+        case 'categorization':
+            if (!userAnswer.categorizedItems) return false;
+            return Object.entries(userAnswer.categorizedItems).every(([category, items]) => {
+                const correctItemsForCategory = minigameData.items?.filter(i => i.category === category);
+                if (items.length !== correctItemsForCategory?.length) return false;
+                const userItemIds = items.map(i => i.id).sort();
+                const correctItemIds = correctItemsForCategory.map(i => i.id).sort();
+                return JSON.stringify(userItemIds) === JSON.stringify(correctItemIds);
+            });
+        case 'layouting':
+             return userAnswer.layout && userAnswer.layout['Main Content']?.length > 0;
+        default:
+            return true; // Allow unknown types to pass
+    }
 };
 
-export const useGameStore = create(
-  persist(
-    (set, get) => ({
-      // STATE
-      gameState: GAME_STATES.SPLASH,
-      allQuests: {},
-      questData: null,
-      stats: {},
-      currentScenarioId: null,
-      currentScenarioIndex: 0,
-      lastFeedback: null,
-      error: null,
-      isLoadingQuests: true,
-      pendingNextScenarioId: null,
-      transientEffect: null,
-      
-      // ACTIONS
-      setGameState: (gameState) => set({ gameState }),
+export const useGameStore = create((set, get) => ({
+    gameState: GAME_STATES.DASHBOARD,
+    allQuests: {},
+    questData: null,
+    currentScenarioId: null,
+    currentScenarioIndex: 0,
+    stats: {},
+    error: null,
+    lastChoiceFeedback: '',
+    transientEffect: null,
+    isLoadingQuests: false,
 
-      fetchAllQuests: () => {
-        // Daftar quest yang tersedia sekarang statis, hanya untuk ditampilkan di dashboard
-        const availableQuests = {
-          'product-manager': { id: 'product-manager', title: 'A Day as a Product Manager', description: 'Navigasi permintaan, dilema prioritas, dan konflik tim.' },
-          'ui-ux-designer': { id: 'ui-ux-designer', title: 'A Day as a UI/UX Designer', description: 'Hadapi brief tidak jelas dan kendala teknis.' },
-          'backend-engineer': { id: 'backend-engineer', title: 'A Day as a Back-End Engineer', description: 'Atasi bug, rancang sistem, dan berkolaborasi.' },
-        };
-        set({ allQuests: availableQuests, isLoadingQuests: false });
-      },
+    fetchAllQuests: async () => {
+        set({ isLoadingQuests: true, error: null });
+        try {
+            const response = await fetch('/api/fetch-quests', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Gagal mengambil data: Status ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('Fetch all quests response:', data);
+            
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to fetch quests');
+            }
 
-      startQuest: async (questId) => {
+            const questsData = data.quests || {};
+
+            if (Object.keys(questsData).length === 0) {
+                throw new Error("Data quest kosong atau tidak dalam format yang benar dari API.");
+            }
+
+            set({ allQuests: questsData, isLoadingQuests: false, error: null });
+        } catch (error) {
+            console.error("Fetch Error:", error.message);
+            set({ 
+                error: 'Tidak bisa memuat data quest. Pastikan URL API benar dan server MockAPI aktif.', 
+                isLoadingQuests: false,
+                allQuests: {}
+            });
+        }
+    },
+    
+    startQuest: async (questId) => {
         set({ gameState: GAME_STATES.LOADING, error: null });
         try {
-          const data = await generateQuestFromAPI(questId);
-
-          if (!data || !data.scenarios) {
-              throw new Error("Data quest yang diterima dari AI tidak valid.");
-          }
-          
-          set({
-            questData: data,
-            stats: { ...data.initialStats },
-            currentScenarioId: data.startScenarioId,
-            currentScenarioIndex: 1,
-            gameState: GAME_STATES.PLAYING,
-          });
+            console.log('Starting quest:', questId);
+            
+            const response = await fetch('/api/fetch-quests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ questId }),
+            });
+            
+            if (!response.ok) {
+                throw new Error('Gagal mengambil data quest');
+            }
+            
+            const data = await response.json();
+            
+            if (!data.success || !data.quest) {
+                throw new Error(data.error || 'Quest tidak ditemukan');
+            }
+            
+            const questData = data.quest;
+            
+            if (!questData.scenarios || !questData.startScenarioId) {
+                throw new Error('Data quest tidak lengkap');
+            }
+            
+            const startScenario = questData.scenarios[questData.startScenarioId];
+            const isMinigame = startScenario?.minigameData || startScenario?.type === 'minigame';
+            
+            const newState = {
+                questData,
+                stats: { ...questData.initialStats },
+                currentScenarioId: questData.startScenarioId,
+                currentScenarioIndex: 1,
+                gameState: isMinigame ? GAME_STATES.MINIGAME : GAME_STATES.PLAYING,
+            };
+            
+            set(newState);
+            safeLocalStorage.setItem('arunaquest-save', JSON.stringify(newState));
         } catch (error) {
-          console.error('Error starting quest:', error);
-          set({
-            error: `Gagal memuat quest: ${error.message}`,
-            gameState: GAME_STATES.DASHBOARD,
-          });
+            console.error('Error starting quest:', error);
+            set({ 
+                error: `Gagal memuat quest: ${error.message}`, 
+                gameState: GAME_STATES.DASHBOARD 
+            });
         }
-      },
-
-      handleChoice: (choice) => {
-        const { effect, feedback, nextSceneId } = choice;
-        const newStats = { ...get().stats };
-        newStats[STATS.TEKNIS] += (effect.teknis || 0);
-        newStats[STATS.SOSIAL] += (effect.sosial || 0);
-        newStats[STATS.INISIATIF] += (effect.inisiatif || 0);
-
-        set({
-          stats: newStats,
-          lastFeedback: { effect, feedback },
-          gameState: GAME_STATES.FEEDBACK,
-          pendingNextScenarioId: nextSceneId,
-          transientEffect: effect,
-        });
-        setTimeout(() => set({ transientEffect: null }), 1000);
-      },
-      
-      advanceToNextScenario: () => {
-        const nextSceneId = get().pendingNextScenarioId;
-        if (nextSceneId === null) {
-          get().endQuest();
-          return;
-        }
-
-        const nextScenario = get().questData.scenarios[nextSceneId];
-        const newGameState = nextScenario?.type === 'minigame' ? GAME_STATES.MINIGAME : GAME_STATES.PLAYING;
+    },
+  
+    handleChoice: (choice) => {
+        set({ transientEffect: choice.effect });
         
-        set((state) => ({
-          currentScenarioId: nextSceneId,
-          currentScenarioIndex: state.currentScenarioIndex + 1,
-          gameState: newGameState,
-          lastFeedback: null,
-        }));
-      },
+        setTimeout(() => {
+            set({ transientEffect: null });
+            const { stats, questData, currentScenarioIndex } = get();
+            const newStats = { ...stats };
+            Object.entries(choice.effect || {}).forEach(([statKey, value]) => {
+                if (newStats[statKey] !== undefined) newStats[statKey] += value;
+            });
 
-      completeMinigame: (minigameEffect, feedback, nextSceneId) => {
-        get().handleChoice({ effect: minigameEffect, feedback, nextSceneId });
-      },
-      
-      endQuest: () => {
-        const { questData, stats } = get();
-        if (typeof window !== 'undefined' && window.localStorage) {
-          localStorage.setItem('lastQuestReport', JSON.stringify({ questData, stats }));
+            set({ stats: newStats, lastChoiceFeedback: choice.feedback, gameState: GAME_STATES.FEEDBACK });
+
+            setTimeout(() => {
+                if (!choice.nextSceneId) {
+                    console.log('No next scene, ending quest');
+                    get().endQuest();
+                    return;
+                }
+
+                const nextScenario = questData.scenarios[choice.nextSceneId];
+                
+                if (!nextScenario) {
+                    console.log('Next scenario not found, ending quest');
+                    get().endQuest();
+                    return;
+                }
+                
+                const isMinigame = nextScenario.minigameData || nextScenario.type === 'minigame';
+                const nextGameState = isMinigame ? GAME_STATES.MINIGAME : GAME_STATES.PLAYING;
+                
+                const newState = {
+                    currentScenarioId: choice.nextSceneId,
+                    currentScenarioIndex: currentScenarioIndex + 1,
+                    gameState: nextGameState,
+                };
+                set(newState);
+                
+                const currentState = get();
+                safeLocalStorage.setItem('arunaquest-save', JSON.stringify({ 
+                    ...currentState, 
+                    ...newState, 
+                    lastChoiceFeedback: '', 
+                    transientEffect: null 
+                }));
+            }, 2500);
+        }, 1500);
+    },
+    
+    completeMinigame: (userAnswer, minigameData) => {
+        const { stats, questData, currentScenarioIndex, currentScenarioId } = get();
+        const scenario = questData.scenarios[currentScenarioId];
+        const isCorrect = validateMiniGame(minigameData.type, userAnswer, minigameData);
+  
+        if (!isCorrect) {
+            set({ 
+                lastChoiceFeedback: "Hmm, sepertinya ada yang kurang tepat. Coba kita lihat lagi.", 
+                gameState: GAME_STATES.FEEDBACK 
+            });
+            setTimeout(() => set({ 
+                gameState: GAME_STATES.MINIGAME, 
+                lastChoiceFeedback: '' 
+            }), 2500);
+            return;
         }
-        set({ gameState: GAME_STATES.REPORT });
-      },
+  
+        set({ transientEffect: scenario.effect });
+  
+        setTimeout(() => {
+            set({ transientEffect: null });
+            const newStats = { ...stats };
+            Object.entries(scenario.effect || {}).forEach(([statKey, value]) => {
+                if (newStats[statKey] !== undefined) newStats[statKey] += value;
+            });
+  
+            set({ stats: newStats, lastChoiceFeedback: scenario.feedback, gameState: GAME_STATES.FEEDBACK });
+  
+            setTimeout(() => {
+                if (!scenario.nextSceneId) {
+                    console.log('Minigame was last scene, ending quest');
+                    get().endQuest();
+                    return;
+                }
 
-      resetGame: () => {
-        set({
-          gameState: GAME_STATES.DASHBOARD,
-          questData: null,
-          stats: {},
-          currentScenarioId: null,
-          currentScenarioIndex: 0,
-          lastFeedback: null,
-          error: null,
+                const nextScenario = questData.scenarios[scenario.nextSceneId];
+                
+                if (!nextScenario) {
+                    console.log('Next scenario after minigame not found, ending quest');
+                    get().endQuest();
+                    return;
+                }
+                
+                const isMinigame = nextScenario.minigameData || nextScenario.type === 'minigame';
+                const nextGameState = isMinigame ? GAME_STATES.MINIGAME : GAME_STATES.PLAYING;
+                
+                const newState = {
+                    currentScenarioId: scenario.nextSceneId,
+                    currentScenarioIndex: currentScenarioIndex + 1,
+                    gameState: nextGameState,
+                };
+                set(newState);
+                
+                const currentState = get();
+                safeLocalStorage.setItem('arunaquest-save', JSON.stringify({ 
+                    ...currentState, 
+                    ...newState, 
+                    lastChoiceFeedback: '', 
+                    transientEffect: null 
+                }));
+            }, 2500);
+        }, 1500);
+    },
+
+    endQuest: () => {
+        const { stats, questData } = get();
+        console.log('🏁 Ending quest, transitioning to REPORT state');
+        
+        safeLocalStorage.setItem('quest-report-data', JSON.stringify({ stats, questData }));
+        safeLocalStorage.removeItem('arunaquest-save');
+        
+        set({ 
+            gameState: GAME_STATES.REPORT,
+            lastChoiceFeedback: null,
+            transientEffect: null,
         });
-      },
-    }),
-    {
-      name: 'arunaquest-storage',
-      storage: createJSONStorage(() => sessionStorage), // Ganti ke sessionStorage agar tidak tersimpan selamanya
-      partialize: (state) => ({
-        // Hanya simpan state yang aman untuk disimpan
-      }),
+    },
+  
+    resetQuest: () => {
+        safeLocalStorage.removeItem('arunaquest-save');
+        safeLocalStorage.removeItem('quest-report-data');
+        set({ 
+            gameState: GAME_STATES.DASHBOARD,
+            questData: null,
+            stats: {},
+            currentScenarioId: null,
+            currentScenarioIndex: 0,
+            lastChoiceFeedback: '',
+            transientEffect: null,
+            error: null,
+        });
+    },
+  
+    loadSavedGame: () => {
+        const saved = safeLocalStorage.getItem('arunaquest-save');
+        if (saved) {
+            const savedState = JSON.parse(saved);
+            savedState.allQuests = get().allQuests;
+            set(savedState);
+        }
     }
-  )
-);
+}));
