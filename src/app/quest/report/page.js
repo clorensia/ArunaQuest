@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import QuestReport from "@/app/components/quest/QuestReport";
 import { useGameStore } from "@/app/store/gameStore";
-import PageTransition from "@/app/components/ui/PageTransition"; // ← IMPORT INI
+import PageTransition from "@/app/components/animations/PageTransition"; // ← IMPORT INI
 
 export default function ReportPage() {
   const [reportData, setReportData] = useState(null);

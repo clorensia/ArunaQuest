@@ -13,7 +13,7 @@ import BlogModal from '@/app/components/ui/BlogModal'
 import Problem from '@/app/components/sections/Problem'
 import SplashScreen from '@/app/components/ui/SplashScreen'
 import UnderMaintenanceModal from '@/app/components/ui/UnderMaintenanceModal'
-import PageTransition from '@/app/components/ui/PageTransition'
+import PageTransition from '@/app/components/animations/PageTransition'
 
 export default function Home() {
   const [videoModalOpen, setVideoModalOpen] = useState(false)

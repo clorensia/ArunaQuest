@@ -1,7 +1,6 @@
 'use client'
 import { CheckCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import RevealOnScroll from '@/app/components/animations/RevealOnScroll'
 
 export default function Pricing() {
   const router = useRouter()
@@ -78,22 +77,22 @@ export default function Pricing() {
     <section id="pricing" className="py-20 md:py-28">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-          <RevealOnScroll>
+          <div>
             <h2 className="text-3xl md:text-4xl font-bold text-white">
               Pilih Jalur Eksplorasimu
             </h2>
-          </RevealOnScroll>
+          </div>
           
-          <RevealOnScroll delay={150}>
+          <div>
             <p className="mt-4 text-slate-400 max-w-3xl mx-auto">
               Mulai gratis, dan tingkatkan paketmu saat siap untuk eksplorasi lebih dalam.
             </p>
-          </RevealOnScroll>
+          </div>
         </div>
         
         <div className="grid lg:grid-cols-3 gap-8 items-center">
           {plans.map((plan, index) => (
-            <RevealOnScroll key={index} delay={plan.delay}>
+            <div key={index}>
               <div className={`glass-card p-8 rounded-2xl h-full ${plan.popular ? 'border-2 border-purple-500 relative' : ''}`}>
                 {plan.popular && (
                   <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 px-4 py-1 bg-purple-500 text-white text-sm font-bold rounded-full">
@@ -129,7 +128,7 @@ export default function Pricing() {
                   {plan.buttonText}
                 </button>
               </div>
-            </RevealOnScroll>
+            </div>
           ))}
         </div>
       </div>

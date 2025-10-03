@@ -8,7 +8,7 @@ import QuestPlayer from '@/app/components/quest/QuestPlayer';
 import MiniGamePlayer from '@/app/components/quest/MiniGamePlayer';
 import FeedbackScreen from '@/app/components/quest/FeedbackScreen';
 import FloatingScore from '@/app/components/quest/FloatingScore';
-import PageTransition from '@/app/components/ui/PageTransition'; 
+import PageTransition from '@/app/components/animations/PageTransition'; 
 
 const LoadingSpinner = () => (
     <div className="flex flex-col items-center justify-center min-h-[70vh]">

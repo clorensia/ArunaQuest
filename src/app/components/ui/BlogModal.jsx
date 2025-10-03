@@ -1,54 +1,61 @@
 'use client'
-
-import { useEffect } from 'react'
-import { Wrench } from 'lucide-react'
+import { motion, AnimatePresence } from "framer-motion"
+import { X } from "lucide-react"
+import { backdropVariants, modalVariants } from "./ModalVariants.jsx"
 
 export default function BlogModal({ isOpen, onClose }) {
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose()
-    }
-    
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'hidden'
-    }
-    
-    return () => {
-      document.removeEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen, onClose])
-
   if (!isOpen) return null
 
+  const blogPosts = [
+    { title: "Kesalahan Fatal Saat Memilih Karier", excerpt: "Hindari jebakan umum.", date: "15 Des 2024", readTime: "5 min" },
+    { title: "Mengapa Simulasi Lebih Efektif", excerpt: "Learning by doing lebih efektif.", date: "10 Des 2024", readTime: "7 min" },
+    { title: "Career Path: Engineer vs PM", excerpt: "Analisis perbedaan jalur karier.", date: "5 Des 2024", readTime: "8 min" }
+  ]
+
   return (
-    <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
-      onClick={onClose}
-    >
-      <div
-        className="glass-card p-8 rounded-2xl w-full max-w-md text-center animate-in zoom-in-95 duration-300"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="bg-purple-500/20 text-purple-300 rounded-lg w-16 h-16 flex items-center justify-center mb-5 mx-auto">
-          <Wrench className="w-8 h-8" />
-        </div>
-        
-        <h3 className="text-2xl font-bold text-white">Segera Hadir!</h3>
-        
-        <p className="text-slate-400 mt-2">
-          Blog kami sedang dalam tahap pengembangan untuk memberikan Anda konten karier terbaik. 
-          Nantikan ya!
-        </p>
-        
-        <button
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto"
+          variants={backdropVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
           onClick={onClose}
-          className="mt-6 cta-gradient text-white font-semibold px-5 py-2 rounded-lg cta-button"
         >
-          Mengerti
-        </button>
-      </div>
-    </div>
+          <motion.div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+
+          <motion.div
+            className="relative w-full max-w-3xl bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-700 my-8"
+            variants={modalVariants}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-slate-900 border-b border-slate-700 p-6 flex justify-between">
+              <h2 className="text-2xl font-bold text-white">📝 Blog & Insights</h2>
+              <button onClick={onClose} className="bg-slate-800 hover:bg-slate-700 rounded-full p-2">
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {blogPosts.map((post, i) => (
+                <motion.article
+                  key={i}
+                  className="glass-card p-6 border border-slate-700 hover:border-purple-500"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <h3 className="text-lg font-bold text-white mb-2">{post.title}</h3>
+                  <p className="text-slate-400 text-sm mb-4">{post.excerpt}</p>
+                  <div className="flex items-center gap-4 text-xs text-slate-500">
+                    <span>📅 {post.date}</span>
+                    <span>⏱️ {post.readTime}</span>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

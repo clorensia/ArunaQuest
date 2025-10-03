@@ -1,8 +1,7 @@
 'use client'
-
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
-import { LogOut, User } from 'lucide-react'
+import { LogOut, User, Sparkles } from 'lucide-react'
 
 export default function Navigation({ onBlogClick, onCommunityClick }) {
   const { user, signOut } = useAuth()
@@ -42,9 +41,19 @@ export default function Navigation({ onBlogClick, onCommunityClick }) {
         
         <div>
           {user ? (
-            // User logged in
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
+            // User logged in - Show profile + quest access
+            <div className="flex items-center gap-3">
+              {/* Quick Quest Access */}
+              <Link
+                href="/quest"
+                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-purple-500/20 border border-purple-500/50 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="font-semibold">Quest</span>
+              </Link>
+
+              {/* User Profile */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-slate-800/50 rounded-lg border border-slate-700">
                 {user.photoURL ? (
                   <img 
                     src={user.photoURL} 
@@ -54,24 +63,28 @@ export default function Navigation({ onBlogClick, onCommunityClick }) {
                 ) : (
                   <User className="w-8 h-8 text-purple-400" />
                 )}
-                <span className="text-white text-sm hidden sm:inline">
+                <span className="text-white text-sm font-medium hidden sm:inline max-w-[100px] truncate">
                   {user.displayName || 'User'}
                 </span>
               </div>
+
+              {/* Logout Button */}
               <button
                 onClick={signOut}
-                className="secondary-cta text-white font-semibold px-4 py-2 rounded-lg inline-flex items-center gap-2"
+                className="secondary-cta text-white font-semibold px-4 py-2 rounded-lg inline-flex items-center gap-2 hover:bg-rose-500/20 hover:border-rose-500/50 hover:text-rose-300 transition-all"
+                title="Logout"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           ) : (
-            // User not logged in
+            // User not logged in - Show sign in
             <Link
               href="/login"
-              className="cta-gradient text-white font-semibold px-5 py-2 rounded-lg cta-button inline-block"
+              className="cta-gradient text-white font-semibold px-5 py-2 rounded-lg cta-button inline-flex items-center gap-2"
             >
+              <User className="w-4 h-4" />
               Sign In
             </Link>
           )}
