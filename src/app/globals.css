@@ -138,3 +138,11 @@
 .animate-blink {
   animation: blink 1.5s linear infinite;
 }
+
+/* Add these animations */
+@keyframes slide-in-right { /* ... */ }
+@keyframes slide-out-right { /* ... */ }
+@keyframes confetti-fall { /* ... */ }
+@keyframes shimmer { /* ... */ }
+@keyframes draw-polygon { /* ... */ }
+@keyframes float { /* ... */ }
