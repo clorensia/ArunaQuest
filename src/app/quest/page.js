@@ -8,6 +8,7 @@ import QuestPlayer from '@/app/components/quest/QuestPlayer';
 import MiniGamePlayer from '@/app/components/quest/MiniGamePlayer';
 import FeedbackScreen from '@/app/components/quest/FeedbackScreen';
 import FloatingScore from '@/app/components/quest/FloatingScore';
+import PageTransition from '@/app/components/ui/PageTransition'; // ← IMPORT INI
 
 const LoadingSpinner = () => (
     <div className="flex flex-col items-center justify-center min-h-[70vh]">
@@ -22,14 +23,8 @@ export default function QuestPage() {
     const { gameState, currentScenarioId, questData, transientEffect } = useGameStore();
     const router = useRouter();
 
-    // Handle navigation to report page
     useEffect(() => {
-        console.log('🎮 QuestPage - Game State:', gameState);
-        
         if (gameState === GAME_STATES.REPORT) {
-            console.log('📊 Navigating to report page...');
-            
-            // Use replace to prevent back navigation issues
             router.replace('/quest/report');
         }
     }, [gameState, router]);
@@ -48,7 +43,6 @@ export default function QuestPage() {
             case GAME_STATES.MINIGAME:
                 const scenario = questData?.scenarios?.[currentScenarioId];
                 if (!scenario) {
-                    console.error('Scenario not found for minigame');
                     return <LoadingSpinner />;
                 }
                 return <MiniGamePlayer scenario={scenario} />;
@@ -57,7 +51,6 @@ export default function QuestPage() {
                 return <FeedbackScreen />;
             
             case GAME_STATES.REPORT:
-                // Show loading while navigating
                 return <LoadingSpinner />;
             
             case GAME_STATES.DASHBOARD:
@@ -67,9 +60,9 @@ export default function QuestPage() {
     };
 
     return (
-        <>
+        <PageTransition> {/* ← WRAP CONTENT DI SINI */}
             <FloatingScore effect={transientEffect} />
             {renderContent()}
-        </>
+        </PageTransition>
     );
 }

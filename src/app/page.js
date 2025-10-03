@@ -10,15 +10,17 @@ import Pricing from '@/app/components/sections/Pricing'
 import FinalCTA from '@/app/components/sections/FinalCTA'
 import VideoModal from '@/app/components/ui/VideoModal'
 import BlogModal from '@/app/components/ui/BlogModal'
+import SplashScreen from '@/app/components/ui/SplashScreen'
 import Problem from '@/app/components/sections/Problem'
+import PageTransition from '@/app/components/ui/PageTransition' // ← IMPORT INI
 
 export default function Home() {
   const [videoModalOpen, setVideoModalOpen] = useState(false)
   const [blogModalOpen, setBlogModalOpen] = useState(false)
 
   return (
-    <>
-      {/* <SplashScreen /> */}
+    <PageTransition> {/* ← WRAP SEMUA CONTENT */}
+      <SplashScreen />
       
       <Navigation 
         onBlogClick={() => setBlogModalOpen(true)}
@@ -50,6 +52,6 @@ export default function Home() {
         isOpen={blogModalOpen}
         onClose={() => setBlogModalOpen(false)}
       />
-    </>
-  )
+    </PageTransition>
+  );
 }
