@@ -1,3 +1,6 @@
+// File: src/app/components/layout/Footer.jsx
+'use client'
+
 import { useState } from 'react'
 import { Twitter, Instagram, Linkedin } from 'lucide-react'
 import UnderMaintenanceModal from '@/app/components/ui/UnderMaintenanceModal'

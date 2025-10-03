@@ -11,16 +11,6 @@
   --animate-marquee: marquee 30s linear infinite;
 }
 
-/* Custom Animations */
-@keyframes marquee {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
 @keyframes rotation {
   0% {
     transform: rotate(0deg);
@@ -29,6 +19,34 @@
     transform: rotate(360deg);
   }
 }
+
+/* === ANIMATIONS FOR MODALS (from tailwindcss-animate) === */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoom-in-95 {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Utility classes for animations */
+.animate-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.zoom-in-95 {
+  animation: zoom-in-95 0.3s ease-out;
+}
+/* === END OF ANIMATIONS FOR MODALS === */
+
 
 /* Gradients & Backgrounds */
 .hero-gradient {
@@ -95,18 +113,6 @@
   transform: scale(1.1);
 }
 
-/* Scroll Animations */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease-out, transform 0.6s ease-out;
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 /* Splash Screen Loader */
 .loader {
   width: 48px;
@@ -118,11 +124,6 @@
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
   margin-top: 20px;
-}
-
-/* Marquee Animation */
-.animate-marquee {
-  animation: marquee 30s linear infinite;
 }
 
 /* Blink Animation for Available Quest */
@@ -138,11 +139,3 @@
 .animate-blink {
   animation: blink 1.5s linear infinite;
 }
-
-/* Add these animations */
-@keyframes slide-in-right { /* ... */ }
-@keyframes slide-out-right { /* ... */ }
-@keyframes confetti-fall { /* ... */ }
-@keyframes shimmer { /* ... */ }
-@keyframes draw-polygon { /* ... */ }
-@keyframes float { /* ... */ }

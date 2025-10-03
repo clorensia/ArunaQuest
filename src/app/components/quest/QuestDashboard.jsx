@@ -1,3 +1,4 @@
+// File: src/app/components/quest/QuestDashboard.jsx
 'use client';
 import { useEffect } from 'react';
 import { useGameStore } from '@/app/store/gameStore';
@@ -14,6 +15,7 @@ export default function QuestDashboard() {
     } = useGameStore();
 
     useEffect(() => {
+        // Fetch quests on mount if not already loaded
         if (Object.keys(allQuests).length === 0 && !error) {
             fetchAllQuests();
         }

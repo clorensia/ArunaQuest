@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect } from 'react'
 import { Construction, ArrowLeft } from 'lucide-react'
 
@@ -22,7 +24,7 @@ export default function UnderMaintenanceModal({ isOpen, onClose, feature = "Fitu
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-in fade-in duration-300"
       onClick={onClose}
     >
       <div

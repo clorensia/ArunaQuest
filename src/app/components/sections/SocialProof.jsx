@@ -4,7 +4,7 @@ import RevealOnScroll from '@/app/components/animations/RevealOnScroll'
 
 export default function SocialProof() {
   const companies = [
-    'Skillvul',
+    'Skilvul',
     'Perempuan Inovasi',
     'Yayasan Dian Sastro',
     'Markoding',

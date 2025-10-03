@@ -1,3 +1,5 @@
+'use client' 
+
 import { useState, useEffect } from 'react'
 import { PlayCircle } from 'lucide-react'
 import RevealOnScroll from '@/app/components/animations/RevealOnScroll'
