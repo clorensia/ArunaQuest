@@ -1,54 +1,105 @@
-'use client';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebaseConfig'; // auth bisa jadi null sekarang
+'use client'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  signOut as firebaseSignOut,
+  onAuthStateChanged 
+} from 'firebase/auth'
+import { auth } from '@/lib/firebaseConfig'
+import { useRouter } from 'next/navigation'
 
-const AuthContext = createContext();
+const AuthContext = createContext({})
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider')
+  }
+  return context
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
-    // Pengecekan penting: jangan jalankan listener jika auth gagal
-    if (!auth) {
-      console.error("AuthProvider: Objek Firebase Auth tidak ada. Inisialisasi mungkin gagal.");
-      setLoading(false); // Hentikan loading, user akan tetap null
-      return;
-    }
-
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
+      if (user) {
+        setUser(user)
+      } else {
+        setUser(null)
+      }
+      setLoading(false)
+    })
 
-    return () => unsubscribe();
-  }, []);
+    return () => unsubscribe()
+  }, [])
 
   const signInWithGoogle = async () => {
-    if (!auth) return console.error("Login gagal: Auth tidak terinisialisasi.");
-    const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const provider = new GoogleAuthProvider()
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      })
+      
+      const result = await signInWithPopup(auth, provider)
+      
+      // Success feedback
+      console.log('✅ Login successful:', result.user.displayName)
+      
+      // Redirect to quest dashboard after successful login
+      router.push('/quest')
+      
+      return result.user
     } catch (error) {
-      console.error("Error signing in with Google: ", error);
+      console.error('❌ Login error:', error)
+      
+      // User-friendly error messages
+      let errorMessage = 'Terjadi kesalahan saat login'
+      
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Login dibatalkan'
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Tidak ada koneksi internet'
+      } else if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'Pop-up diblokir oleh browser. Silakan izinkan pop-up dan coba lagi.'
+      }
+      
+      alert(errorMessage)
+      throw error
     }
-  };
+  }
 
-  const logOut = async () => {
-    if (!auth) return console.error("Logout gagal: Auth tidak terinisialisasi.");
+  const signOut = async () => {
     try {
-      await signOut(auth);
+      await firebaseSignOut(auth)
+      console.log('✅ Logout successful')
+      
+      // Clear any stored data
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('quest-report-data')
+      }
+      
+      // Redirect to home after logout
+      router.push('/')
     } catch (error) {
-      console.error("Error signing out: ", error);
+      console.error('❌ Logout error:', error)
+      alert('Terjadi kesalahan saat logout')
     }
-  };
+  }
+
+  const value = {
+    user,
+    loading,
+    signInWithGoogle,
+    signOut
+  }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, logOut }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
-  );
-};
-
-export const useAuth = () => useContext(AuthContext);
+  )
+}
