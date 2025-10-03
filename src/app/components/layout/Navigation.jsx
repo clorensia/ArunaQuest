@@ -1,11 +1,10 @@
-// File: src/app/components/layout/Navigation.jsx
 'use client'
 
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import { LogOut, User } from 'lucide-react'
 
-export default function Navigation({ onBlogClick }) {
+export default function Navigation({ onBlogClick, onCommunityClick }) {
   const { user, signOut } = useAuth()
 
   return (
@@ -31,6 +30,14 @@ export default function Navigation({ onBlogClick }) {
           >
             Blog
           </button>
+          {onCommunityClick && (
+            <button 
+              onClick={onCommunityClick}
+              className="hover:text-white transition-colors"
+            >
+              Community
+            </button>
+          )}
         </div>
         
         <div>

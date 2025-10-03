@@ -1,28 +1,68 @@
-'use client'
+'use client';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useGameStore, GAME_STATES } from '@/app/store/gameStore';
 
-import { useState } from 'react'
-import UnderMaintenanceModal from '@/app/components/ui/UnderMaintenanceModal'
+import QuestDashboard from '@/app/components/quest/QuestDashboard';
+import QuestPlayer from '@/app/components/quest/QuestPlayer';
+import MiniGamePlayer from '@/app/components/quest/MiniGamePlayer';
+import FeedbackScreen from '@/app/components/quest/FeedbackScreen';
+import FloatingScore from '@/app/components/quest/FloatingScore';
+import PageTransition from '@/app/components/ui/PageTransition'; 
 
-export default function Home() {
-  const [testModal, setTestModal] = useState(false)
-
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <button 
-        onClick={() => {
-          console.log('🔥 Button clicked!')
-          setTestModal(true)
-        }}
-        className="cta-gradient text-white font-bold py-3 px-6 rounded-lg"
-      >
-        TEST MODAL
-      </button>
-
-      <UnderMaintenanceModal 
-        isOpen={testModal}
-        onClose={() => setTestModal(false)}
-        feature="Test Feature"
-      />
+const LoadingSpinner = () => (
+    <div className="flex flex-col items-center justify-center min-h-[70vh]">
+        <div className="loader"></div>
+        <p className="text-xl font-medium mt-6 text-slate-400">
+            Menyiapkan petualanganmu...
+        </p>
     </div>
-  )
+);
+
+export default function QuestPage() {
+    const { gameState, currentScenarioId, questData, transientEffect } = useGameStore();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (gameState === GAME_STATES.REPORT) {
+            router.replace('/quest/report');
+        }
+    }, [gameState, router]);
+
+    const renderContent = () => {
+        switch (gameState) {
+            case GAME_STATES.LOADING:
+                return <LoadingSpinner />;
+            
+            case GAME_STATES.PLAYING:
+                if (!questData || !currentScenarioId) {
+                    return <LoadingSpinner />;
+                }
+                return <QuestPlayer />;
+            
+            case GAME_STATES.MINIGAME:
+                const scenario = questData?.scenarios?.[currentScenarioId];
+                if (!scenario) {
+                    return <LoadingSpinner />;
+                }
+                return <MiniGamePlayer scenario={scenario} />;
+            
+            case GAME_STATES.FEEDBACK:
+                return <FeedbackScreen />;
+            
+            case GAME_STATES.REPORT:
+                return <LoadingSpinner />;
+            
+            case GAME_STATES.DASHBOARD:
+            default:
+                return <QuestDashboard />;
+        }
+    };
+
+    return (
+        <PageTransition> {/* ← WRAP CONTENT DI SINI */}
+            <FloatingScore effect={transientEffect} />
+            {renderContent()}
+        </PageTransition>
+    );
 }

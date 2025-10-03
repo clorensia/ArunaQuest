@@ -1,11 +1,10 @@
-// File: src/app/components/layout/Footer.jsx
 'use client'
 
 import { useState } from 'react'
 import { Twitter, Instagram, Linkedin } from 'lucide-react'
 import UnderMaintenanceModal from '@/app/components/ui/UnderMaintenanceModal'
 
-export default function Footer({ onBlogClick }) {
+export default function Footer({ onBlogClick, onCommunityClick }) {
     const [maintenanceModal, setMaintenanceModal] = useState({ isOpen: false, feature: '' })
 
     const handleFeatureClick = (featureName) => {
@@ -67,6 +66,16 @@ export default function Footer({ onBlogClick }) {
                                         Blog
                                     </button>
                                 </li>
+                                {onCommunityClick && (
+                                    <li>
+                                        <button
+                                            onClick={onCommunityClick}
+                                            className="hover:text-white transition-colors text-left"
+                                        >
+                                            Community
+                                        </button>
+                                    </li>
+                                )}
                                 <li>
                                     <button 
                                         onClick={() => handleFeatureClick("Contact Us")}

@@ -1,20 +1,32 @@
 'use client'
-import { useState } from 'react'
 import { CheckCircle } from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import RevealOnScroll from '@/app/components/animations/RevealOnScroll'
-import UnderMaintenanceModal from '@/app/components/ui/UnderMaintenanceModal'
 
 export default function Pricing() {
-  const [maintenanceModal, setMaintenanceModal] = useState({ isOpen: false, feature: '' })
+  const router = useRouter()
 
   const handlePlanClick = (planName) => {
-    if (planName === 'Explorer') {
-      // Free plan - redirect to quest page
-      window.location.href = '/quest'
-    } else {
-      // Paid plans - show maintenance modal
-      setMaintenanceModal({ isOpen: true, feature: `Paket ${planName}` })
+    console.log('💰 Plan clicked:', planName)
+    
+    switch (planName) {
+      case 'Explorer':
+        console.log('✅ Redirecting to /quest')
+        router.push('/quest')
+        break
+      
+      case 'Adventurer':
+        console.log('💳 Redirecting to /payment')
+        router.push('/payment')
+        break
+      
+      case 'Untuk Institusi':
+        console.log('📧 Redirecting to /contact-sales')
+        router.push('/contact-sales')
+        break
+      
+      default:
+        console.warn('Unknown plan:', planName)
     }
   }
 
@@ -30,7 +42,6 @@ export default function Pricing() {
       buttonText: 'Coba Gratis',
       buttonClass: 'secondary-cta',
       delay: 200,
-      isFree: true,
     },
     {
       name: 'Adventurer',
@@ -64,72 +75,64 @@ export default function Pricing() {
   ]
 
   return (
-    <>
-      <section id="pricing" className="py-20 md:py-28">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <RevealOnScroll>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">
-                Pilih Jalur Eksplorasimu
-              </h2>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={150}>
-              <p className="mt-4 text-slate-400 max-w-3xl mx-auto">
-                Mulai gratis, dan tingkatkan paketmu saat siap untuk eksplorasi lebih dalam.
-              </p>
-            </RevealOnScroll>
-          </div>
+    <section id="pricing" className="py-20 md:py-28">
+      <div className="container mx-auto px-6">
+        <div className="text-center mb-16">
+          <RevealOnScroll>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">
+              Pilih Jalur Eksplorasimu
+            </h2>
+          </RevealOnScroll>
           
-          <div className="grid lg:grid-cols-3 gap-8 items-center">
-            {plans.map((plan, index) => (
-              <RevealOnScroll key={index} delay={plan.delay}>
-                <div className={`glass-card p-8 rounded-2xl h-full ${plan.popular ? 'border-2 border-purple-500 relative' : ''}`}>
-                  {plan.popular && (
-                    <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 px-4 py-1 bg-purple-500 text-white text-sm font-bold rounded-full">
-                      PALING POPULER
-                    </div>
-                  )}
-                  
-                  <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
-                  <p className="text-slate-400 mt-2">{plan.description}</p>
-                  
-                  <p className="text-5xl font-extrabold text-white mt-8">
-                    {plan.price}
-                    {plan.priceUnit && (
-                      <span className="text-lg font-medium text-slate-400">
-                        {plan.priceUnit}
-                      </span>
-                    )}
-                  </p>
-                  
-                  <ul className="mt-8 space-y-4 text-slate-300">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-teal-400 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <button
-                    onClick={() => handlePlanClick(plan.name)}
-                    className={`${plan.buttonClass} block text-center w-full mt-10 text-white font-bold py-3 rounded-lg`}
-                  >
-                    {plan.buttonText}
-                  </button>
-                </div>
-              </RevealOnScroll>
-            ))}
-          </div>
+          <RevealOnScroll delay={150}>
+            <p className="mt-4 text-slate-400 max-w-3xl mx-auto">
+              Mulai gratis, dan tingkatkan paketmu saat siap untuk eksplorasi lebih dalam.
+            </p>
+          </RevealOnScroll>
         </div>
-      </section>
-
-      <UnderMaintenanceModal 
-        isOpen={maintenanceModal.isOpen}
-        onClose={() => setMaintenanceModal({ isOpen: false, feature: '' })}
-        feature={maintenanceModal.feature}
-      />
-    </>
+        
+        <div className="grid lg:grid-cols-3 gap-8 items-center">
+          {plans.map((plan, index) => (
+            <RevealOnScroll key={index} delay={plan.delay}>
+              <div className={`glass-card p-8 rounded-2xl h-full ${plan.popular ? 'border-2 border-purple-500 relative' : ''}`}>
+                {plan.popular && (
+                  <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 px-4 py-1 bg-purple-500 text-white text-sm font-bold rounded-full">
+                    PALING POPULER
+                  </div>
+                )}
+                
+                <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
+                <p className="text-slate-400 mt-2">{plan.description}</p>
+                
+                <p className="text-5xl font-extrabold text-white mt-8">
+                  {plan.price}
+                  {plan.priceUnit && (
+                    <span className="text-lg font-medium text-slate-400">
+                      {plan.priceUnit}
+                    </span>
+                  )}
+                </p>
+                
+                <ul className="mt-8 space-y-4 text-slate-300">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <CheckCircle className="w-5 h-5 text-teal-400 flex-shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                
+                <button
+                  onClick={() => handlePlanClick(plan.name)}
+                  className={`${plan.buttonClass} block text-center w-full mt-10 text-white font-bold py-3 rounded-lg transition-all hover:transform hover:scale-105`}
+                >
+                  {plan.buttonText}
+                </button>
+              </div>
+            </RevealOnScroll>
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }

@@ -1,4 +1,3 @@
-// File: src/app/page.js
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -13,20 +12,52 @@ import VideoModal from '@/app/components/ui/VideoModal'
 import BlogModal from '@/app/components/ui/BlogModal'
 import Problem from '@/app/components/sections/Problem'
 import SplashScreen from '@/app/components/ui/SplashScreen'
+import UnderMaintenanceModal from '@/app/components/ui/UnderMaintenanceModal'
 import PageTransition from '@/app/components/ui/PageTransition'
 
 export default function Home() {
   const [videoModalOpen, setVideoModalOpen] = useState(false)
   const [blogModalOpen, setBlogModalOpen] = useState(false)
   const [showSplash, setShowSplash] = useState(true)
+  const [maintenanceModalOpen, setMaintenanceModalOpen] = useState(false)
+  const [maintenanceFeature, setMaintenanceFeature] = useState('Fitur ini')
+
+  // Debug logs
+  useEffect(() => {
+    console.log('🎬 App State:')
+    console.log('  - Video modal:', videoModalOpen)
+    console.log('  - Blog modal:', blogModalOpen)
+    console.log('  - Maintenance modal:', maintenanceModalOpen)
+    console.log('  - Feature:', maintenanceFeature)
+  }, [videoModalOpen, blogModalOpen, maintenanceModalOpen, maintenanceFeature])
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false)
     }, 500)
-
     return () => clearTimeout(timer)
   }, [])
+
+  const handleCommunityClick = () => {
+    console.log('🌐 Community link clicked!')
+    setMaintenanceFeature('Halaman Komunitas')
+    setMaintenanceModalOpen(true)
+  }
+
+  const handleVideoClick = () => {
+    console.log('📹 Video button clicked!')
+    setVideoModalOpen(true)
+  }
+
+  const handleBlogClick = () => {
+    console.log('📝 Blog button clicked!')
+    setBlogModalOpen(true)
+  }
+
+  const handleCloseMaintenanceModal = () => {
+    console.log('❌ Closing maintenance modal')
+    setMaintenanceModalOpen(false)
+  }
 
   return (
     <>
@@ -36,11 +67,12 @@ export default function Home() {
         ) : (
           <>
             <Navigation 
-              onBlogClick={() => setBlogModalOpen(true)}
+              onBlogClick={handleBlogClick}
+              onCommunityClick={handleCommunityClick}
             />
             
             <Hero 
-              onVideoClick={() => setVideoModalOpen(true)}
+              onVideoClick={handleVideoClick}
             />
             
             <SocialProof />
@@ -53,20 +85,28 @@ export default function Home() {
             </main>
             
             <Footer 
-              onBlogClick={() => setBlogModalOpen(true)}
+              onBlogClick={handleBlogClick}
+              onCommunityClick={handleCommunityClick}
             />
           </>
         )}
       </PageTransition>
 
-      {/* MODALS - Outside PageTransition */}
+      {/* ALL MODALS - Outside PageTransition to ensure proper z-index */}
       <VideoModal 
         isOpen={videoModalOpen} 
         onClose={() => setVideoModalOpen(false)} 
       />
+      
       <BlogModal 
         isOpen={blogModalOpen} 
         onClose={() => setBlogModalOpen(false)} 
+      />
+      
+      <UnderMaintenanceModal 
+        isOpen={maintenanceModalOpen} 
+        onClose={handleCloseMaintenanceModal} 
+        feature={maintenanceFeature} 
       />
     </>
   )
