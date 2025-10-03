@@ -129,9 +129,9 @@ function QuestDashboard() {
                     >
                         <div className="flex-grow">
                              <h3 className="text-xl font-bold text-white mb-2">
-                                Quest Travelis
+                                Tunggu sebentar... 
                             </h3>
-                             <p className="text-purple-400 text-sm font-semibold mb-3">Tunggu sebentar... Quest Baru sedang dalam perjalanan!</p>
+                             <p className="text-purple-400 text-sm font-semibold mb-3">Quest Baru sedang dalam perjalanan!</p>
                             <p className="text-slate-400 text-sm mb-4 flex-grow">
                                 Kami sedang merancang tantangan terbaru yang bakal bikin penasaran. Simpan energimu!
                             </p>

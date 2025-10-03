@@ -10,7 +10,6 @@ import Pricing from '@/app/components/sections/Pricing'
 import FinalCTA from '@/app/components/sections/FinalCTA'
 import VideoModal from '@/app/components/ui/VideoModal'
 import BlogModal from '@/app/components/ui/BlogModal'
-import SplashScreen from '@/app/components/ui/SplashScreen'
 import Problem from '@/app/components/sections/Problem'
 
 export default function Home() {

@@ -1,6 +1,10 @@
-import Link from 'next/link'
+'use client'; 
+import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext'; 
 
 export default function Navigation({ onBlogClick }) {
+  const { user, logOut } = useAuth(); 
+
   return (
     <nav className="bg-black/30 backdrop-blur-lg sticky top-0 z-50 border-b border-white/10">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -27,14 +31,25 @@ export default function Navigation({ onBlogClick }) {
         </div>
         
         <div>
-          <Link 
-            href="#"
-            className="cta-gradient text-white font-semibold px-5 py-2 rounded-lg cta-button inline-block"
-          >
-            Sign In
-          </Link>
+          {user ? (
+            // Jika user sudah login
+            <button 
+              onClick={logOut}
+              className="secondary-cta text-white font-semibold px-5 py-2 rounded-lg inline-block"
+            >
+              Sign Out
+            </button>
+          ) : (
+            // Jika belum login
+            <Link 
+              href="/login"
+              className="cta-gradient text-white font-semibold px-5 py-2 rounded-lg cta-button inline-block"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </nav>
-  )
+  );
 }
